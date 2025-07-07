@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charity Council Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-50 font-['Inter']">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">Charity Council Portal</h1>
+
+        <!-- Tabs -->
+        <div class="mb-8">
+            <div class="border-b border-gray-200">
+                <nav class="flex space-x-8" aria-label="Tabs">
+                    <button class="tab-btn active px-4 py-2 text-blue-600 border-b-2 border-blue-600" data-tab="new-case">
+                        Submit New Case
+                    </button>
+                    <button class="tab-btn px-4 py-2 text-gray-500 hover:text-gray-700" data-tab="search-case">
+                        Search Existing Case
+                    </button>
+                </nav>
+            </div>
+        </div>
+
+        <!-- New Case Form -->
+        <div id="new-case" class="tab-content block">
+            <form id="newCaseForm" class="space-y-6 max-w-2xl mx-auto">
+                <div class="grid grid-cols-1 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">EID Number of Breadwinner</label>
+                        <input type="text" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Name</label>
+                        <input type="text" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Nationality</label>
+                        <select required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            <option value="">Select Nationality</option>
+                            <option value="UAE">UAE</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Mobile Number</label>
+                        <input type="tel" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Type of Support</label>
+                        <select required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            <option value="">Select Type</option>
+                            <option value="Medical">Medical support</option>
+                            <option value="Educational">Educational support</option>
+                            <option value="Rental">Rental</option>
+                            <option value="Furniture">Furniture</option>
+                            <option value="Orphans">Sponsorship of orphans</option>
+                            <option value="Utility">Utility bills</option>
+                            <option value="Food">Food assistance</option>
+                            <option value="Hardship">Hardship Relief</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Amount</label>
+                        <input type="number" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Trust Index</label>
+                        <select required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            <option value="1">1 - Very low trust</option>
+                            <option value="2">2 - Low trust</option>
+                            <option value="3">3 - Neutral/Moderate trust</option>
+                            <option value="4">4 - High trust</option>
+                            <option value="5">5 - Very high trust</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex justify-end">
+                    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700">Submit Case</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Search Case Form -->
+        <div id="search-case" class="tab-content hidden">
+            <div class="max-w-2xl mx-auto">
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700">Enter EID Number</label>
+                    <div class="mt-1 flex rounded-md shadow-sm">
+                        <input type="text" id="searchEID" class="flex-1 rounded-l-md border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                        <button onclick="searchCase()" class="bg-blue-600 text-white px-4 rounded-r-md hover:bg-blue-700">Search</button>
+                    </div>
+                </div>
+                <div id="searchResults" class="hidden bg-white rounded-lg shadow p-6">
+                    <!-- Results will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab Switching
+        document.querySelectorAll('.tab-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active', 'text-blue-600', 'border-blue-600'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+                button.classList.add('active', 'text-blue-600', 'border-blue-600');
+                document.getElementById(button.dataset.tab).classList.remove('hidden');
+            });
+        });
+
+        // Store cases in localStorage for demo purposes
+        const cases = JSON.parse(localStorage.getItem('cases')) || {};
+
+        // New Case Form Submission
+        document.getElementById('newCaseForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const caseData = {
+                eid: formData.get('EID Number of Breadwinner'),
+                name: formData.get('Name'),
+                nationality: formData.get('Nationality'),
+                mobile: formData.get('Mobile Number'),
+                type: formData.get('Type of Support'),
+                amount: formData.get('Amount'),
+                trustIndex: formData.get('Trust Index'),
+                lastUpdate: new Date().toISOString()
+            };
+            
+            cases[caseData.eid] = caseData;
+            localStorage.setItem('cases', JSON.stringify(cases));
+            
+            alert('Case submitted successfully!');
+            e.target.reset();
+        });
+
+        // Search Case Function
+        function searchCase() {
+            const eid = document.getElementById('searchEID').value;
+            const resultsDiv = document.getElementById('searchResults');
+            const caseData = cases[eid];
+
+            if (caseData) {
+                const lastUpdate = new Date(caseData.lastUpdate).toLocaleString();
+                resultsDiv.innerHTML = `
+                    <h3 class="text-lg font-semibold mb-4">Case Details</h3>
+                    <div class="space-y-3">
+                        <p><strong>Name:</strong> ${caseData.name}</p>
+                        <p><strong>Nationality:</strong> ${caseData.nationality}</p>
+                        <p><strong>Mobile:</strong> ${caseData.mobile}</p>
+                        <p><strong>Support Type:</strong> ${caseData.type}</p>
+                        <p><strong>Amount:</strong> ${caseData.amount}</p>
+                        <p><strong>Trust Index:</strong> ${caseData.trustIndex}</p>
+                        <p><strong>Last Updated:</strong> ${lastUpdate}</p>
+                    </div>
+                `;
+                resultsDiv.classList.remove('hidden');
+            } else {
+                resultsDiv.innerHTML = '<p class="text-red-600">No case found with this EID number.</p>';
+                resultsDiv.classList.remove('hidden');
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom styles for form elements */
+        input, select {
+            @apply border rounded-md p-2;
+        }
+        .tab-btn.active {
+            @apply border-b-2 border-blue-600;
+        }
+    </style>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
